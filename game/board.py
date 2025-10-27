@@ -15,8 +15,7 @@ def check_if_pressed(box_number):
     return False
 
 def get_board():
-    for i in range(0,9,3):
-        print(board[i] ,board[i+1], board[i+2])
+    global board
     return board
 
 def check_win():

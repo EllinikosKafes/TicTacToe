@@ -1,4 +1,5 @@
 import pygame
+from game import settings
 
 def menu(screen):
     clock = pygame.time.Clock()
@@ -25,9 +26,9 @@ def menu(screen):
                 elif event.key == pygame.K_RETURN:
                     return options[selected]
 
-        screen.fill((0, 0, 0))
+        screen.fill(settings.black)
 
-        title = title_font.render("Tic Tac Toe", True, (255, 255, 255))
+        title = title_font.render("Tic Tac Toe", True, settings.white)
         screen.blit(title, (100, 50))
 
         # Draw options
@@ -39,7 +40,7 @@ def menu(screen):
             y_offset += 50
 
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(settings.FPS)
 
 
 def show_end_screen(screen, clock, winner_name):
@@ -63,10 +64,10 @@ def show_end_screen(screen, clock, winner_name):
         # We do NOT clear the screen — board stays visible
         # Simply draw text overlay
         text = font.render(f"{winner_name} Wins!", True, (255, 255, 0))
-        sub = small_font.render("Press ENTER to play again", True, (255, 255, 255))
+        sub = small_font.render("Press ENTER to play again", True, (0, 0, 150))
 
         screen.blit(text, (125, 20))
         screen.blit(sub, (50, 300))
 
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(settings.FPS)

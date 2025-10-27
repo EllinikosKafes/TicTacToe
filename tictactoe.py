@@ -1,4 +1,4 @@
-from game import game_manager,player,board
+from game import game_manager,player,board,settings
 from ui import renderer,events
 import pygame
 
@@ -32,13 +32,20 @@ def main_game():
         renderer.refresh(clock,screen,board.get_board())
 
 pygame.init()
-clock, screen = renderer.setting_up(400, 400)
+clock, screen = renderer.setting_up(settings.WIDTH, settings.HEIGHT)
 
 mode = game_manager.menu(screen)
 
-while True:
-    action = main_game()
-    if action == "quit":
-        break
+if mode == "Solo":
+    while True:
+        action = main_game()
+        if action == "quit":
+            break
+
+#if mode == "LAN":
+#    while True:
+#        action = lan_game()
+#        if action == "quit":
+#            break
 
 pygame.quit()

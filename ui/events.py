@@ -2,40 +2,22 @@ import pygame
 from pygame.locals import *
 from game import board
 
-def check_hitbox(pos):          
-    if pos[1] <=130:
-        if pos[0]<=130:
-            return 1
-        elif pos[0]<=265 and pos[0]>135:
-            return 2
-        elif pos[0]<=400 and pos[0]>270:
-            return 3
-        else:
-            print("limits")
-
-    elif pos[1]<=265 and pos[1]>135:
-        if pos[0]<=130:
-            return 4
-        elif pos[0]<=265 and pos[0]>135:
-            return 5
-        elif pos[0]<=400 and pos[0]>270:
-            return 6
-        else:
-            print("limits")
-
-    elif pos[1]<=400 and pos[1]>270:
-        if pos[0]<=130:
-            return 7
-        elif pos[0]<=265 and pos[0]>135:
-            return 8
-        elif pos[0]<=400 and pos[0]>270:
-            return 9
-        else:
-            return None
-
-    else:
+def check_hitbox(pos):
+    x, y = pos
+    
+    # Must be inside 400x400 window
+    if not (0 <= x < 400 and 0 <= y < 400):
         return None
 
+    # Grid is 3x3 → each square is ~133.33 pixels
+    box_width = 400 / 3
+
+    col = int(x // box_width)   # 0,1,2         100//133 = 0
+    row = int(y // box_width)   # 0,1,2         200//133 = 1
+
+    # Convert row/col → box number 1–9
+    square_id = row * 3 + col + 1              
+    return square_id
 
 def check_box():
     for event in pygame.event.get():

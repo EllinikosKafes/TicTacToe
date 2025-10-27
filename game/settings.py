@@ -1,0 +1,7 @@
+white = (255,255,255)
+black = (0,0,0)
+WIDTH = 400
+HEIGHT = 400
+X_COLOR = (84,84,84)
+O_COLOR = (242,235,211)
+FPS = 60
