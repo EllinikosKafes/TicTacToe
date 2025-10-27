@@ -27,6 +27,14 @@ def main_game():
                     return action
                     running = False
                     
+                if board.is_full():
+                    renderer.refresh(clock, screen, board.get_board())
+                    pygame.display.update()
+
+                    action = game_manager.show_end_screen(screen, clock, False)
+                    return action
+                    running = False
+                    
                 current_player = player2 if current_player==player1 else player1
         
         renderer.refresh(clock,screen,board.get_board())

@@ -60,12 +60,15 @@ def show_end_screen(screen, clock, winner_name):
                     return "restart"
                 if event.key == pygame.K_ESCAPE:
                     return "quit"
-
+                
+        if winner_name != False:
         # We do NOT clear the screen — board stays visible
         # Simply draw text overlay
-        text = font.render(f"{winner_name} Wins!", True, (255, 255, 0))
+            text = font.render(f"{winner_name} Wins!", True, (255, 255, 0))
+        else:
+            text = font.render(f"DRAW", True, (255, 255, 0))
+            
         sub = small_font.render("Press ENTER to play again", True, (0, 0, 150))
-
         screen.blit(text, (125, 20))
         screen.blit(sub, (50, 300))
 

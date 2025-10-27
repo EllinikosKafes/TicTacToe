@@ -35,3 +35,7 @@ def check_win():
     
     else:
         return False
+
+def is_full():
+    return True if all(board) else False
+    
