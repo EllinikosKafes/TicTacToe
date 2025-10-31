@@ -39,45 +39,38 @@ def main_game():
 
 
 def lan_game():
-    player1 = player.Player("Me",'x')
-    player2 = player.Player("John","o")
-    current_player = player1
+    my_player = player.Player("yo",'x')
     board.clear()
     while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
         try:
-            if client.connect():
+            if client.connect():  # returns True when connected
                 break
-        except Exception:
-            print("Not connected to server yet")
+        except Exception as e:
+            print("Connection error:", e)
+        renderer.connecting(clock, screen)
 
+    # 2️⃣ Wait for both players to be ready
     while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
         try:
-            if client.check_if_ready():
+            if client.check_if_ready():  # returns True when server signals ready
                 break
-        except Exception:
-            print("Waiting for room")
+        except Exception as e:
+            print("Waiting error:", e)
+        renderer.waiting(clock, screen)
 
     while True: 
-        number = events.check_box()
-        if number:
-            if not board.check_if_pressed(number):
-                board.press_square(number,current_player.symbol)
-                win=board.check_win()
-                if win == True:
-                    print(f"{current_player.name} wins!")
-                    renderer.refresh(clock, screen, board.get_board())
-                    pygame.display.update()
-
-                    action = game_manager.show_end_screen(screen, clock, current_player.name)
-                    return action
-    
-                            
-                if board.is_full():
-                    renderer.refresh(clock, screen, board.get_board())
-                    pygame.display.update()
-
-                    action = game_manager.show_end_screen(screen, clock, False)
-                    return action
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit(0)
                 
         renderer.refresh(clock,screen,board.get_board())
                     

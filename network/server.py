@@ -4,7 +4,7 @@ import pickle
 
 # Set up server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("0.0.0.0", 5555))
+server.bind(("0.0.0.0", 5000))
 server.listen(2)
 print("🟢 Server started, waiting for 2 players...")
 
@@ -19,9 +19,11 @@ while len(connections) < 2:
 
 print("✅ Both players connected! Game starting...")
 
-connections[0].send("ready".encode())
-connections[1].send("ready".encode())
+connections[0].send("READY".encode())
+connections[1].send("READY".encode())
 
+connections[0].send("0".encode())
+connections[1].send("1".encode())
 turn = 0  # 0 or 1 to indicate whose turn it is
 
 while True:
@@ -48,4 +50,6 @@ while True:
 for conn in connections:
     conn.close()
 
+
 print("Server closed.")
+server.close()

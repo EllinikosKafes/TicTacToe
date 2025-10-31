@@ -31,3 +31,8 @@ def check_box():
             else:
                 return None
             
+def check_if_exit():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit(0)

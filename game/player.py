@@ -4,6 +4,7 @@ class Player:
         self.name = name
         self.symbol = symbol
         self.number = Player.count
+        self.play_on_turn = 0
         Player.count+=1
 
     def __repr__(self):

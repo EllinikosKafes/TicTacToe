@@ -4,6 +4,8 @@ from game import settings
 
 pygame.font.init()
 font = pygame.font.SysFont("Arial",50,bold=True)
+small_font = pygame.font.SysFont("Arial",25,bold=True)
+
 
 def draw_text(screen,text):
     img = font.render(text,True,(255,255,255))
@@ -41,3 +43,19 @@ def draw_board(screen):
     pygame.draw.line(screen,"white",(270,0),(270,400),5)
     pygame.draw.line(screen,"white",(0,130),(400,130),5)
     pygame.draw.line(screen,"white",(0,265),(400,265),5)
+
+def connecting(clock,screen):
+    screen.fill("black")
+    img=small_font.render("Connecting to server",True,settings.white)
+    screen.blit(img,(50,200))
+    pygame.display.flip()
+    clock.tick(settings.FPS)
+    
+
+def waiting(clock,screen):
+    screen.fill("black")
+    img=small_font.render("Waiting for others",True,settings.white)
+    screen.blit(img,(50,200))
+    pygame.display.flip()
+    clock.tick(settings.FPS)
+    

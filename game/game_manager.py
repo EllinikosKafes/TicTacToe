@@ -1,6 +1,8 @@
 import pygame
 from game import settings
 
+turn = 0
+
 def menu(screen):
     clock = pygame.time.Clock()
 
@@ -74,3 +76,6 @@ def show_end_screen(screen, clock, winner_name):
 
         pygame.display.update()
         clock.tick(settings.FPS)
+
+def change_turns():
+    turn = 1 if turn==0 else 0
