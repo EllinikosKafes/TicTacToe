@@ -1,6 +1,6 @@
 from game import game_manager,player,board,settings
 from ui import renderer,events
-from network import client
+from network import client as lan_client
 import pygame
 
 
@@ -39,40 +39,51 @@ def main_game():
 
 
 def lan_game():
-    my_player = player.Player("yo",'x')
-    board.clear()
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
-        try:
-            if client.connect():  # returns True when connected
-                break
-        except Exception as e:
-            print("Connection error:", e)
-        renderer.connecting(clock, screen)
+    
+    # Initialize board and client
+    game_board = board.Board()
+    my_player = player.Player("Me", "x")
+    client = lan_client.LANClient()
 
-    # 2️⃣ Wait for both players to be ready
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
-        try:
-            if client.check_if_ready():  # returns True when server signals ready
-                break
-        except Exception as e:
-            print("Waiting error:", e)
-        renderer.waiting(clock, screen)
+    # Determine whose turn this client plays
+    turn = 0
+    print(f"My player ID (turn): {client.play_on_turn}")
 
-    while True: 
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit(0)
-                
-        renderer.refresh(clock,screen,board.get_board())
+
+        renderer.refresh(clock, screen, game_board.get_board())
+
+        # ✅ Only allow input on your turn
+        if turn == client.play_on_turn:
+            number = events.check_box()
+            if number and not game_board.check_if_pressed(number):
+                game_board.press_square(number, my_player.symbol)
+                client.update(game_board.get_board())
+                # Wait for server update (new board + next turn)
+                game_board.board, turn = client.listen(game_board.board)
+
+                win = game_board.check_win()
+                if win:
+                    renderer.refresh(clock, screen, game_board.get_board())
+                    pygame.display.update()
+                    action = game_manager.show_end_screen(screen, clock, my_player.name)
+                    return action
+
+                if game_board.is_full():
+                    renderer.refresh(clock, screen, game_board.get_board())
+                    pygame.display.update()
+                    action = game_manager.show_end_screen(screen, clock, False)
+                    return action
+        else:
+            # Wait for opponent move
+            game_board.board, turn = client.listen(game_board.board)
+
+        renderer.refresh(clock, screen, game_board.get_board())
                     
 
 

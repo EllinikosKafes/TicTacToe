@@ -13,6 +13,7 @@ def draw_text(screen,text):
     
 
 def draw_boxes(screen,board):
+    
     for i in range(len(board)):                         # run through the board (list)
         if board[i]!=0:                                 # if board[i] has x or o in it ...
             img = font.render(board[i],True,settings.X_COLOR) if board[i] == 'x' else font.render(board[i],True,settings.O_COLOR)# render the relative symbol (x or o)

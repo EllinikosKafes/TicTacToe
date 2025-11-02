@@ -1,23 +1,30 @@
-# network/client.py
+# client.py
 import socket
-import pickle
+import json
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class LANClient:
+    def __init__(self, host='localhost', port=5555):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect((host, port))
+        # Receive player id (0 or 1)
+        self.play_on_turn = int(self.client.recv(1024).decode())
 
-def send(number):
-    client.send(str(number)).encode()
+    def update(self, board):
+        # Send board to server
+        message = json.dumps({"type": "update", "board": board})
+        self.client.send(message.encode())
+        print("Message sent to server\n",message)
 
-def receive():
-    return int(client.recv(1024).decode())
+    def listen(self,board):
+        buffer = b""
+        while True:
+            chunk = self.client.recv(1024)
+            if not chunk:
+                return board, 0
+            buffer += chunk
+            try:
+                msg = json.loads(buffer.decode())
+                return msg["board"], msg["turn"]
+            except json.JSONDecodeError:
+                continue  # wait for more data
 
-
-def connect():
-    try:
-        client.connect(('127.0.0.1', 5000))
-        return True
-    except:
-        return False
-
-def check_if_ready():
-    data = client.recv(1024).decode()
-    return data == "READY"

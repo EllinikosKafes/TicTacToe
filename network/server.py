@@ -1,55 +1,72 @@
-# network/server.py
+# server.py
 import socket
-import pickle
+import json
+import threading
 
-# Set up server
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("0.0.0.0", 5000))
-server.listen(2)
-print("🟢 Server started, waiting for 2 players...")
+# Keep track of connected clients
+clients = []
+board = [""] * 9
+turn = 0  # 0 = player 1, 1 = player 2
 
-connections = []
-addresses = []
+lock = threading.Lock()
 
-while len(connections) < 2:
-    conn, addr = server.accept()
-    print(f"Player connected from {addr}")
-    connections.append(conn)
-    addresses.append(addr)
+def broadcast(data):
+    for c in clients:
+        c.send(json.dumps(data).encode())
 
-print("✅ Both players connected! Game starting...")
+def handle_client(conn, player_id):
+    global board, turn
+    while True:
+        try:
+            data = conn.recv(1024)
+            if not data:
+                break
 
-connections[0].send("READY".encode())
-connections[1].send("READY".encode())
+            msg = json.loads(data.decode())
+            print("Message received from client\n",msg)
 
-connections[0].send("0".encode())
-connections[1].send("1".encode())
-turn = 0  # 0 or 1 to indicate whose turn it is
-
-while True:
-    try:
-        # Receive a move from current player
-        data = connections[turn].recv(1024)
-        if not data:
+            if msg["type"] == "update":
+                with lock:
+                    board = msg["board"]
+                    # Switch turn
+                    turn = 1 if turn == 0 else 0
+                    # Broadcast updated board + turn to both clients
+                    broadcast({"type": "update", "board": board, "turn": turn})
+        except:
             break
 
-        move = pickle.loads(data)
-        print(f"Player {turn + 1} played {move}")
-
-        # Send the move to the other player
-        other = 1 - turn
-        connections[other].send(pickle.dumps(move))
-
-        # Switch turns
-        turn = other
-
-    except Exception as e:
-        print("❌ Error:", e)
-        break
-
-for conn in connections:
     conn.close()
+    clients.remove(conn)
+    print(f"Player {player_id+1} disconnected")
+    
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('0.0.0.0', 5555))
+    server.listen(2)
+    print("Server running, waiting for players...")
+
+    while len(clients) < 2:
+        conn, addr = server.accept()
+        clients.append(conn)
+        player_id = len(clients)-1
+        print(f"Player {player_id+1} connected: {addr}")
+        # Send player_id to client (0 or 1)
+        conn.send(str(player_id).encode())
+        threading.Thread(target=handle_client, args=(conn, player_id), daemon=True).start()
+
+    print("Two players connected. Game starts!")
+
+    # Keep the server running so daemon threads don’t exit
+    try:
+        while True:
+            pass  # idle loop, main thread stays alive
+    except KeyboardInterrupt:
+        print("\nServer shutting down.")
+        for c in clients:
+            c.close()
+        server.close()
 
 
-print("Server closed.")
-server.close()
+if __name__ == "__main__":
+    main()
+    
